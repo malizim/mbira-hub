@@ -5,7 +5,10 @@ Professional mbira learning and recording platform with real-time note detection
 
 **Developed for Texpo Steamon 2025 by Infinicore Systems (Pvt) Ltd**
 
-<img width="298" height="300" alt="Inificore-Trans1" src="https://github.com/user-attachments/assets/88a7efe4-f7dd-4427-9e0e-337b5b9346ef" />
+<a href="https://infinicore.co.zw" target="_blank" rel="noopener noreferrer">
+  <img width="298" height="300" alt="Inificore-Trans1" 
+       src="https://github.com/user-attachments/assets/88a7efe4-f7dd-4427-9e0e-337b5b9346ef" />
+</a>
 
            
 ## ✨ Features
