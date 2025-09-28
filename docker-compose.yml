@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  mbira-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mbira-recording-session
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+      - "8766:8766"
+    volumes:
+      - ./data:/app/data
+      - ./certs:/app/certs
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - PORT=8443
+      - WS_PORT=8766
+      - DATA_DIR=/app/data
+    networks:
+      - mbira-network
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8443/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: mbira-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - mbira-app
+    networks:
+      - mbira-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mbira-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - mbira-network
+    command: redis-server --appendonly yes
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  mbira-network:
+    driver: bridge

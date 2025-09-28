@@ -1,0 +1,599 @@
+/* Mbira-themed styling with real-time note detection features */
+
+/* Global background skin */
+.mbira-skin {
+    background-image: url('/static/img/mbira_bg.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+}
+
+/* Sticky glass header */
+.header-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.28) 70%, rgba(0,0,0,0));
+    padding: 10px 0 6px;
+}
+
+.badge img {
+    height: 240px;
+    width: auto;
+    border-radius: .6rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
+
+.session-title {
+    font-size: 2.4rem;
+    font-weight: 1000;
+    color: #fff;
+    text-shadow: 0 3px 10px rgba(0,0,0,.85);
+    letter-spacing: .2px;
+    line-height: 1.05;
+}
+
+.session-sub {
+    font-size: .9rem;
+    color: #f1f5f9;
+    text-shadow: 0 2px 6px rgba(0,0,0,.8);
+    opacity: .95;
+}
+
+.backdrop {
+    backdrop-filter: blur(2px) saturate(1.1);
+    background: rgba(255,255,255,.86);
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+/* Takes list */
+.take-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .55rem .65rem;
+    border: 1px solid rgba(0,0,0,.07);
+    border-radius: .75rem;
+    background: #fff;
+    margin-bottom: .5rem;
+}
+
+.take-meta {
+    font-size: .9rem;
+    line-height: 1.15rem;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.take-audio {
+    flex: 0 0 300px;
+    max-width: 300px;
+}
+
+.take-indent-1 { margin-left: 1rem; }
+.take-indent-2 { margin-left: 2rem; }
+
+a.logo-link {
+    display: inline-block;
+}
+
+/* Collapse controls */
+.chev {
+    cursor: pointer;
+    user-select: none;
+    font-weight: 700;
+    padding: .1rem .35rem;
+    border-radius: .35rem;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.chev.off {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.take-children {
+    margin-top: .35rem;
+    margin-left: 1.25rem;
+    border-left: 2px dashed #e5e7eb;
+    padding-left: .75rem;
+}
+
+.toolbar {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: .35rem;
+}
+
+.toolbar button {
+    padding: .25rem .6rem;
+    font-size: .8rem;
+    border-radius: .5rem;
+    background: #f1f5f9;
+    border: none;
+    cursor: pointer;
+}
+
+.toolbar button:hover {
+    background: #e2e8f0;
+}
+
+.audio-wrap {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+}
+
+.btn-del {
+    padding: .25rem .5rem;
+    font-size: .75rem;
+    border-radius: .4rem;
+    background: #fee2e2;
+    color: #991b1b;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-del:hover {
+    background: #fecaca;
+}
+
+/* Real-time note detection styles */
+.note-display {
+    font-size: 4rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    min-height: 1.2em;
+}
+
+.note-sequence {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 1rem;
+    background: rgba(0,0,0,0.1);
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.note-highlight {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Recording countdown overlay */
+.rec-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.rec-modal {
+    background: #0f172a;
+    color: #fff;
+    width: min(640px,92vw);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    text-align: center;
+}
+
+.count-num {
+    font-size: 5rem;
+    font-weight: 1000;
+    line-height: 1;
+    margin: .4rem 0;
+}
+
+.count-bar-wrap {
+    height: 10px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: .5rem 0 .25rem;
+}
+
+.count-bar {
+    height: 100%;
+    width: 0%;
+    background: #38bdf8;
+    transition: width .95s linear;
+}
+
+.rec-ctrls {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.rec-btn {
+    padding: .6rem 1.1rem;
+    border-radius: .6rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+/* Music sheet generation styles */
+.music-sheet-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.music-sheet-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    margin: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.music-sheet-link:hover {
+    background: #2563eb;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .take-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .take-audio {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .note-display {
+        font-size: 2.5rem;
+    }
+    
+    .session-title {
+        font-size: 1.8rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status indicators */
+.status-connected {
+    color: #10b981;
+    font-weight: bold;
+}
+
+.status-disconnected {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.status-recording {
+    color: #f59e0b;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    .session-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    /* Modal responsiveness */
+    .modal-content {
+        margin: 10px;
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
+    }
+    
+    /* Training modal mobile */
+    .training-modal {
+        margin: 5px;
+        max-width: calc(100vw - 10px);
+        max-height: calc(100vh - 10px);
+        padding: 15px;
+    }
+    
+    /* Mbira layout mobile */
+    .mbira-layout {
+        padding: 10px;
+    }
+    
+    .mbira-body {
+        max-width: 100%;
+        padding: 10px;
+    }
+    
+    .tines-container {
+        gap: 4px;
+    }
+    
+    .tine {
+        padding: 4px;
+        font-size: 10px;
+        min-height: 30px;
+    }
+    
+    /* Training details mobile */
+    .bg-blue-50 {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .text-4xl {
+        font-size: 2rem;
+    }
+    
+    .text-lg {
+        font-size: 1rem;
+    }
+    
+    /* Button groups mobile */
+    .flex.space-x-4 {
+        flex-direction: column;
+        space-x: 0;
+        gap: 10px;
+    }
+    
+    /* Fullscreen modal mobile */
+    .fixed.inset-0 {
+        padding: 10px;
+    }
+    
+    .max-w-4xl {
+        max-width: 100%;
+    }
+    
+    .text-8xl {
+        font-size: 3rem;
+    }
+    
+    .text-2xl {
+        font-size: 1.25rem;
+    }
+    
+    /* Session page mobile */
+    .grid.md\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .space-y-4 > * + * {
+        margin-top: 1rem;
+    }
+    
+    /* Recording controls mobile */
+    .recording-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .recording-controls .btn {
+        width: 100%;
+    }
+    
+    /* Note sequence mobile */
+    .note-sequence {
+        font-size: 0.875rem;
+        padding: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    /* Session list mobile */
+    .session-item {
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .session-item h3 {
+        font-size: 1.125rem;
+    }
+    
+    .session-item p {
+        font-size: 0.875rem;
+    }
+    
+    /* Countdown mobile */
+    .count-num {
+        font-size: 3rem;
+    }
+    
+    .rec-ctrls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .rec-btn {
+        width: 100%;
+        padding: 0.75rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .container {
+        padding: 5px;
+    }
+    
+    .modal-content {
+        margin: 5px;
+        padding: 15px;
+    }
+    
+    .training-modal {
+        margin: 2px;
+        padding: 10px;
+    }
+    
+    .text-4xl {
+        font-size: 1.75rem;
+    }
+    
+    .text-8xl {
+        font-size: 2.5rem;
+    }
+    
+    .tine {
+        padding: 2px;
+        font-size: 8px;
+        min-height: 25px;
+    }
+    
+    .btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .bg-blue-50 {
+        padding: 10px;
+    }
+    
+    .text-lg {
+        font-size: 0.875rem;
+    }
+    
+    .count-num {
+        font-size: 2.5rem;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .modal-content {
+        max-height: calc(100vh - 10px);
+        overflow-y: auto;
+    }
+    
+    .training-modal {
+        max-height: calc(100vh - 5px);
+        overflow-y: auto;
+    }
+    
+    .text-4xl {
+        font-size: 1.5rem;
+    }
+    
+    .text-8xl {
+        font-size: 2rem;
+    }
+    
+    .count-num {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile-specific optimizations */
+.mobile-device .btn,
+.mobile-device button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+}
+
+.mobile-device input,
+.mobile-device select,
+.mobile-device textarea {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+}
+
+.mobile-device .modal-content,
+.mobile-device .training-modal {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.mobile-device .tine {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+}
+
+/* Prevent text selection on touch elements */
+.mobile-device .btn,
+.mobile-device .tine,
+.mobile-device button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Improve touch feedback */
+.mobile-device .btn:active,
+.mobile-device .tine:active,
+.mobile-device button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
