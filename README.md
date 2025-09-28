@@ -1,15 +1,13 @@
 # 🎵 Mbira Hub v1.0
 
-       ![Mbira-Hub_logo_2](https://github.com/user-attachments/assets/b62efbf9-97f4-48f3-ad9c-147969341395)
-
-
+       
 Professional mbira learning and recording platform with real-time note detection, synchronized playback highlighting, and music sheet generation.
 
 **Developed for Texpo Steamon 2025 by Infinicore Systems (Pvt) Ltd**
 
 <img width="597" height="600" alt="Inificore-Trans1" src="https://github.com/user-attachments/assets/88a7efe4-f7dd-4427-9e0e-337b5b9346ef" />
 
-                  
+              
 
 ## ✨ Features
 
