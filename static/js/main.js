@@ -7,6 +7,18 @@ let lastNoteTime = 0;
 let lastMaxValue = 0;
 const noteDebounceTime = 1000; // ms - increased to prevent sustained note repeats
 
+// Audio level calibration for different devices
+let audioLevelCalibration = {
+    enabled: false,
+    baselineLevel: 0,
+    sensitivityMultiplier: 1.0,
+    adaptiveThreshold: 60, // Lower default threshold for mobile devices
+    maxThreshold: 200,
+    minThreshold: 20,
+    calibrationSamples: [],
+    isCalibrating: false
+};
+
 // Note mapping for real-time detection
 const NOTE_MAPPING = {
     'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 
@@ -112,14 +124,36 @@ function detectNotesRealtime() {
         }
     }
     
-    // Only process if we have a strong signal (increased threshold to reduce sensitivity)
-    if (maxValue > 180) {
+    // Use adaptive threshold based on device calibration
+    const threshold = audioLevelCalibration.enabled ? audioLevelCalibration.adaptiveThreshold : 60;
+    
+    // Collect calibration samples if calibrating
+    if (audioLevelCalibration.isCalibrating) {
+        audioLevelCalibration.calibrationSamples.push(maxValue);
+    }
+    
+    // Only process if we have a strong signal
+    if (maxValue > threshold) {
         const frequency = maxIndex * (sampleRate / 2) / bufferLength;
         const noteInfo = frequencyToNote(frequency);
         
         // Update current note display
         document.getElementById('currentNote').textContent = noteInfo.note;
         document.getElementById('currentFreq').textContent = frequency.toFixed(1) + ' Hz';
+        
+        // Update audio level indicator
+        const levelPercent = Math.min(100, (maxValue / 255) * 100);
+        const levelBar = document.getElementById('audioLevelBar');
+        const levelText = document.getElementById('audioLevelText');
+        if (levelBar) {
+            levelBar.style.width = levelPercent + '%';
+            levelBar.className = levelPercent > 70 ? 'bg-green-500 h-2 rounded-full transition-all duration-100' : 
+                                levelPercent > 40 ? 'bg-yellow-500 h-2 rounded-full transition-all duration-100' : 
+                                'bg-red-500 h-2 rounded-full transition-all duration-100';
+        }
+        if (levelText) {
+            levelText.textContent = Math.round(maxValue);
+        }
         
         if (noteInfo.inScale) {
             document.getElementById('currentNote').style.color = '#00ff88'; // Green
@@ -248,6 +282,110 @@ let trainingNotes = [
     { note: 'F5', description: 'F note (Top Middle - Shortest)', position: 'top-middle' }
 ];
 
+// Audio calibration functions
+function startAudioCalibration() {
+    audioLevelCalibration.isCalibrating = true;
+    audioLevelCalibration.calibrationSamples = [];
+    
+    // Show calibration UI
+    const calibrationDiv = document.getElementById('audioCalibration');
+    if (calibrationDiv) {
+        calibrationDiv.innerHTML = `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-yellow-800 mb-2">🎤 Audio Level Calibration</h3>
+                <p class="text-sm text-yellow-700 mb-3">Please play a few notes on your instrument for 10 seconds to calibrate audio levels for your device.</p>
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <div class="bg-yellow-200 rounded-full h-2">
+                            <div id="calibrationProgress" class="bg-yellow-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="calibrationCountdown" class="text-sm font-mono text-yellow-800">10</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Start calibration timer
+    let timeLeft = 10;
+    const countdownInterval = setInterval(() => {
+        timeLeft--;
+        const countdownEl = document.getElementById('calibrationCountdown');
+        const progressEl = document.getElementById('calibrationProgress');
+        
+        if (countdownEl) countdownEl.textContent = timeLeft;
+        if (progressEl) progressEl.style.width = `${((10 - timeLeft) / 10) * 100}%`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            finishAudioCalibration();
+        }
+    }, 1000);
+}
+
+function finishAudioCalibration() {
+    audioLevelCalibration.isCalibrating = false;
+    
+    if (audioLevelCalibration.calibrationSamples.length > 0) {
+        // Calculate average baseline level
+        const avgLevel = audioLevelCalibration.calibrationSamples.reduce((a, b) => a + b, 0) / audioLevelCalibration.calibrationSamples.length;
+        audioLevelCalibration.baselineLevel = avgLevel;
+        
+        // Set adaptive threshold based on baseline
+        audioLevelCalibration.adaptiveThreshold = Math.max(
+            audioLevelCalibration.minThreshold,
+            Math.min(audioLevelCalibration.maxThreshold, avgLevel * 1.5)
+        );
+        
+        audioLevelCalibration.enabled = true;
+        
+        // Show success message
+        const calibrationDiv = document.getElementById('audioCalibration');
+        if (calibrationDiv) {
+            calibrationDiv.innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <h3 class="font-semibold text-green-800 mb-2">✅ Audio Calibration Complete</h3>
+                    <p class="text-sm text-green-700">Baseline level: ${Math.round(avgLevel)} | Threshold: ${Math.round(audioLevelCalibration.adaptiveThreshold)}</p>
+                    <button onclick="resetAudioCalibration()" class="mt-2 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Recalibrate</button>
+                </div>
+            `;
+        }
+    } else {
+        // No samples collected, use default
+        audioLevelCalibration.adaptiveThreshold = 60;
+        audioLevelCalibration.enabled = true;
+        
+        const calibrationDiv = document.getElementById('audioCalibration');
+        if (calibrationDiv) {
+            calibrationDiv.innerHTML = `
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                    <h3 class="font-semibold text-orange-800 mb-2">⚠️ Using Default Audio Levels</h3>
+                    <p class="text-sm text-orange-700">No audio detected during calibration. Using default sensitivity settings.</p>
+                    <button onclick="startAudioCalibration()" class="mt-2 px-3 py-1 bg-orange-600 text-white rounded text-sm hover:bg-orange-700">Try Again</button>
+                </div>
+            `;
+        }
+    }
+}
+
+function resetAudioCalibration() {
+    audioLevelCalibration.enabled = false;
+    audioLevelCalibration.baselineLevel = 0;
+    audioLevelCalibration.calibrationSamples = [];
+    audioLevelCalibration.adaptiveThreshold = 60;
+    
+    const calibrationDiv = document.getElementById('audioCalibration');
+    if (calibrationDiv) {
+        calibrationDiv.innerHTML = `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-blue-800 mb-2">🎤 Audio Level Calibration</h3>
+                <p class="text-sm text-blue-700 mb-3">Calibrate audio levels for optimal note detection on your device.</p>
+                <button onclick="startAudioCalibration()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Calibration</button>
+            </div>
+        `;
+    }
+}
+
 // Mobile detection and optimization
 function isMobile() {
     return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -272,6 +410,11 @@ function applyMobileOptimizations() {
         document.querySelectorAll('.modal-content, .training-modal').forEach(element => {
             element.style.webkitOverflowScrolling = 'touch';
         });
+        
+        // Adjust audio sensitivity for mobile devices
+        audioLevelCalibration.adaptiveThreshold = 40; // Lower threshold for mobile
+        audioLevelCalibration.maxThreshold = 150;
+        audioLevelCalibration.enabled = true; // Auto-enable for mobile
     }
 }
 
@@ -923,8 +1066,16 @@ function detectNotesFullscreen() {
         }
     }
     
-    // Only process if we have a strong signal (increased threshold to reduce sensitivity)
-    if (maxValue > 180) {
+    // Use adaptive threshold based on device calibration
+    const threshold = audioLevelCalibration.enabled ? audioLevelCalibration.adaptiveThreshold : 60;
+    
+    // Collect calibration samples if calibrating
+    if (audioLevelCalibration.isCalibrating) {
+        audioLevelCalibration.calibrationSamples.push(maxValue);
+    }
+    
+    // Only process if we have a strong signal
+    if (maxValue > threshold) {
         const frequency = maxIndex * (sampleRate / 2) / bufferLength;
         const noteInfo = frequencyToNote(frequency);
         

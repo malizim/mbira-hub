@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Mbira Recording Session v3.0 Deployment Script
-# This script sets up the complete application with all features
+# Mbira Hub v1.0 Deployment Script
+# Professional mbira learning platform deployment
+# Developed for Texpo Steamon 2025 by Infinicore Systems (Pvt) Ltd
 
 set -e
 
-echo "🎵 Deploying Mbira Recording Session v3.0..."
+echo "🎵 Deploying Mbira Hub v1.0..."
 echo "=============================================="
 
 # Check if running as root

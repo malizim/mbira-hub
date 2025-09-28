@@ -1,7 +1,7 @@
 {
-  "name": "mbira-recording-session",
-  "version": "3.0.0",
-  "description": "Advanced mbira recording session with real-time note detection and music sheet generation",
+  "name": "mbira-hub",
+  "version": "1.0.0",
+  "description": "Professional mbira learning and recording platform with real-time note detection and music sheet generation",
   "main": "server/index.js",
   "type": "module",
   "scripts": {
@@ -39,14 +39,15 @@
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
-  "keywords": [
-    "mbira",
-    "recording",
-    "music",
-    "real-time",
-    "note-detection",
-    "music-sheet"
-  ],
-  "author": "Rhythm Keepers",
+    "keywords": [
+      "mbira",
+      "music-education",
+      "note-detection",
+      "music-sheet",
+      "texpo",
+      "infinicore",
+      "learning-platform"
+    ],
+    "author": "Infinicore Systems (Pvt) Ltd",
   "license": "MIT"
 }

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎵 Mbira Hub - Professional Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="mbira-skin">
+    <div class="max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+        <!-- Header - Mobile Optimized -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 mbira-hub-logo">
+                <!-- Mbira-Hub Logo -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-lg p-2 sm:p-3 shadow-lg">
+                    <div class="text-xl sm:text-2xl font-black text-blue-600">🎵</div>
+                </div>
+                <div>
+                    <div class="text-xl sm:text-3xl font-black text-white">Mbira Hub</div>
+                    <div class="text-xs sm:text-sm text-slate-300 hidden sm:block">Professional mbira learning platform with real-time note detection</div>
+                    <div class="text-xs text-slate-300 sm:hidden">Real-time note detection</div>
+                </div>
+            </div>
+            <!-- Rhythm Keepers Logo - Mobile Responsive -->
+            <a class="logo-link" href="https://live.telco.co.zw/event/texpo-steamon-2/track/texpo-steamon-25-hackathon-challenges-36" target="_blank" rel="noopener">
+                <div class="badge">
+                    <img src="/static/img/logo.jpeg" alt="Rhythm Keepers" class="h-12 sm:h-16 w-auto rounded-lg shadow-lg">
+                </div>
+            </a>
+        </div>
+
+        <!-- Create New Session - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <h2 class="font-semibold mb-2 text-sm sm:text-base">Create New Session</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input id="newName" class="border rounded px-3 py-2 text-sm sm:text-base" placeholder="Session name">
+                <input id="newPassword" type="password" class="border rounded px-3 py-2 text-sm sm:text-base" placeholder="Password">
+                <button id="createBtn" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base">Create</button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2">Contact administrator for access credentials</p>
+        </div>
+
+        <!-- Join Existing Session - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <h2 class="font-semibold mb-2 text-sm sm:text-base">Join Existing Session</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input id="joinSessId" class="border rounded px-3 py-2 text-sm sm:text-base" placeholder="Session ID">
+                <input id="joinPassword" type="password" class="border rounded px-3 py-2 text-sm sm:text-base" placeholder="Password">
+                <button id="joinBtn" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm sm:text-base">Join</button>
+            </div>
+        </div>
+
+        <!-- Existing Sessions - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-2">
+                <h2 class="font-semibold text-sm sm:text-base">Existing Sessions</h2>
+                <button id="refreshBtn" class="px-3 py-1 bg-slate-100 rounded hover:bg-slate-200 text-xs sm:text-sm w-full sm:w-auto">Refresh</button>
+            </div>
+            <div id="sessions" class="grid gap-3"></div>
+        </div>
+
+        <!-- Audio Level Calibration - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <h2 class="font-semibold mb-2 text-sm sm:text-base">🎤 Audio Level Calibration</h2>
+            <p class="text-xs sm:text-sm text-slate-600 mb-4">Calibrate audio levels for optimal note detection on your device</p>
+            <div id="audioCalibration">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4">
+                    <h3 class="font-semibold text-blue-800 mb-2 text-sm sm:text-base">🎤 Audio Level Calibration</h3>
+                    <p class="text-xs sm:text-sm text-blue-700 mb-3">Calibrate audio levels for optimal note detection on your device.</p>
+                    <button onclick="startAudioCalibration()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto">Start Calibration</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Note Detection Demo - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-2">
+                <h2 class="font-semibold text-sm sm:text-base">🎵 Real-time Note Detection Demo</h2>
+                <button id="fullscreenBtn" class="px-3 py-1 bg-blue-600 text-white rounded text-xs sm:text-sm hover:bg-blue-700 w-full sm:w-auto">Fullscreen</button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 mb-4">Test the real-time note detection system</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button id="startDetection" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm sm:text-base">Start Detection</button>
+                    <button id="stopDetection" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm sm:text-base" disabled>Stop</button>
+                </div>
+                <div class="text-center sm:text-right">
+                    <div id="currentNote" class="text-xl sm:text-2xl font-bold text-purple-600">Ready</div>
+                    <div id="currentFreq" class="text-xs sm:text-sm text-slate-500">0 Hz</div>
+                    <div class="mt-2">
+                        <div class="text-xs text-slate-500 mb-1">Audio Level:</div>
+                        <div class="bg-slate-200 rounded-full h-2 w-24 sm:w-32 mx-auto">
+                            <div id="audioLevelBar" class="bg-green-500 h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                        <div id="audioLevelText" class="text-xs text-slate-500 mt-1">0</div>
+                    </div>
+                </div>
+            </div>
+            <div id="noteSequence" class="mt-4 p-3 bg-slate-100 rounded text-xs sm:text-sm font-mono min-h-[40px]">
+                Note sequence will appear here...
+            </div>
+        </div>
+
+        <!-- Instrument Training - Mobile Optimized -->
+        <div class="border rounded-xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-2">
+                <h2 class="font-semibold text-sm sm:text-base">🎼 Instrument Training</h2>
+                <button id="refreshInstruments" class="px-3 py-1 bg-slate-100 rounded hover:bg-slate-200 text-xs sm:text-sm w-full sm:w-auto">Refresh</button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 mb-4">Train your specific instrument for better note detection accuracy</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="font-medium mb-2 text-sm sm:text-base">Your Trained Instruments:</h3>
+                    <div id="instrumentList" class="space-y-2">
+                        <div class="text-xs sm:text-sm text-slate-500">Loading...</div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-medium mb-2 text-sm sm:text-base">Actions:</h3>
+                    <div class="space-y-2">
+                        <button id="trainNewInstrument" class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm sm:text-base">Train New Instrument</button>
+                        <button id="testInstrument" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base" disabled>Test Selected Instrument</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Note Detection Modal - Mobile Optimized -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-lg p-3 sm:p-8 max-w-4xl w-full mx-2 sm:mx-4 text-center overflow-y-auto max-h-screen">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-2">
+                <h2 class="text-xl sm:text-3xl font-bold text-purple-600">🎵 Fullscreen Note Detection</h2>
+                <button id="exitFullscreen" class="px-3 sm:px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm sm:text-base w-full sm:w-auto">Exit Fullscreen</button>
+            </div>
+            <div class="mb-6 sm:mb-8">
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
+                    <button id="fullscreenStartDetection" class="px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 text-white rounded text-sm sm:text-lg hover:bg-purple-700">Start Detection</button>
+                    <button id="fullscreenStopDetection" class="px-4 sm:px-6 py-2 sm:py-3 bg-red-600 text-white rounded text-sm sm:text-lg hover:bg-red-700" disabled>Stop Detection</button>
+                </div>
+            </div>
+            <div class="mb-6 sm:mb-8">
+                <div id="fullscreenCurrentNote" class="text-4xl sm:text-8xl font-bold text-purple-600 mb-2 sm:mb-4 min-h-[60px] sm:min-h-[120px] flex items-center justify-center">Ready</div>
+                <div id="fullscreenCurrentFreq" class="text-lg sm:text-2xl text-slate-500 mb-2 sm:mb-4">0 Hz</div>
+            </div>
+            <div id="fullscreenNoteSequence" class="p-3 sm:p-6 bg-slate-100 rounded text-sm sm:text-lg font-mono min-h-[80px] sm:min-h-[100px] overflow-x-auto">
+                Note sequence will appear here...
+            </div>
+        </div>
+    </div>
+
+    <!-- Instrument Training Modal - Mobile Optimized -->
+    <div id="trainingModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-lg p-3 sm:p-8 max-w-4xl w-full mx-2 sm:mx-4 training-modal overflow-y-auto max-h-screen">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-2">
+                <h2 class="text-xl sm:text-3xl font-bold text-green-600">🎼 Train New Instrument</h2>
+                <button id="closeTraining" class="px-3 sm:px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm sm:text-base w-full sm:w-auto">Close</button>
+            </div>
+            
+            <div class="mb-4 sm:mb-6">
+                <label class="block text-xs sm:text-sm font-medium mb-2">Instrument Name:</label>
+                <input id="instrumentName" type="text" class="w-full px-3 py-2 border rounded text-sm sm:text-base" placeholder="e.g., My Mbira, Guitar, Piano">
+            </div>
+
+            <!-- Visual Mbira Layout - Mobile Optimized -->
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-sm sm:text-lg font-semibold mb-2 sm:mb-4">Mbira Layout</h3>
+                <div class="mbira-layout bg-slate-100 p-2 sm:p-4 rounded-lg">
+                    <div class="mbira-diagram">
+                        <div class="mbira-body bg-amber-800 p-2 sm:p-4 rounded-lg mx-auto max-w-md">
+                            <div class="tines-container grid grid-cols-2 gap-1 sm:gap-2">
+                                <!-- Tines will be dynamically generated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-sm sm:text-lg font-semibold mb-2 sm:mb-4">Training Progress</h3>
+                <div id="trainingProgress" class="space-y-2 sm:space-y-4">
+                    <div class="text-center text-slate-500 text-xs sm:text-sm">Click "Start Training" to begin</div>
+                </div>
+                
+                <!-- Training Details - Mobile Optimized -->
+                <div id="trainingDetails" class="hidden space-y-2 sm:space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Step:</span>
+                        <span id="currentStep" class="text-green-600 font-bold text-xs sm:text-sm">1/12</span>
+                    </div>
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+                        <div class="text-center">
+                            <div class="text-sm sm:text-lg font-semibold text-blue-800 mb-2">🎵 PLAY THIS NOTE NOW:</div>
+                            <div id="currentNote" class="text-2xl sm:text-4xl font-bold text-blue-600 mb-2">F3</div>
+                            <div id="noteDescription" class="text-sm sm:text-lg text-blue-700">F note (Bottom Middle - Longest)</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Current Note:</span>
+                        <span id="currentNoteSmall" class="text-lg sm:text-xl font-bold text-blue-600">F3</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Note Description:</span>
+                        <span id="noteDescriptionSmall" class="text-slate-600 text-xs sm:text-sm">F note (lowest)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Frequency:</span>
+                        <span id="frequencyDisplay" class="text-purple-600 font-mono text-xs sm:text-sm">-- Hz</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Sample Progress:</span>
+                        <span id="sampleProgress" class="text-orange-600 font-bold text-xs sm:text-sm">Sample 1/4</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-xs sm:text-sm">Next Tine:</span>
+                        <span id="nextTinePreview" class="text-slate-500 text-xs sm:text-sm">G3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <button id="startTraining" class="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded text-sm sm:text-lg hover:bg-green-700 transition-all duration-200 transform hover:scale-105 active:scale-95">Start Training</button>
+                <button id="stopTraining" class="px-4 sm:px-6 py-2 sm:py-3 bg-red-600 text-white rounded text-sm sm:text-lg hover:bg-red-700 transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" disabled>Stop Training</button>
+            </div>
+
+            <div id="trainingStatus" class="mt-3 sm:mt-4 text-center text-xs sm:text-sm text-slate-600">
+                Ready to train your instrument
+            </div>
+            
+            <div id="frequencyValidation" class="mt-2 text-center text-xs sm:text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Footer - Mobile Optimized -->
+    <footer class="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-slate-300">
+        <div class="flex flex-col items-center space-y-3 sm:space-y-4">
+            <!-- Infinicore Systems Logo -->
+            <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                <div class="bg-black rounded-lg p-2 sm:p-3 shadow-lg infinicore-logo">
+                    <div class="text-white text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-cyan-400">∞</div>
+                        <div class="text-xs font-bold text-white">INFINICORE</div>
+                        <div class="text-xs text-gray-300">SYSTEMS</div>
+                    </div>
+                </div>
+                <div class="text-center text-xs sm:text-sm text-slate-500">
+                    <p>Developed for <strong>Texpo Steamon 2025</strong> by</p>
+                    <p class="font-semibold text-slate-700">Infinicore Systems (Pvt) Ltd</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Professional mbira learning and recording platform</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

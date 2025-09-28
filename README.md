@@ -1,12 +1,16 @@
-# 🎵 Mbira Recording Session v3.0
+# 🎵 Mbira Hub v1.0
 
-Advanced mbira recording application with real-time note detection, synchronized playback highlighting, and music sheet generation.
+Professional mbira learning and recording platform with real-time note detection, synchronized playback highlighting, and music sheet generation.
+
+**Developed for Texpo Steamon 2025 by Infinicore Systems (Pvt) Ltd**
+
+       
 
 ## ✨ Features
 
 ### Core Features (v2.5 Parity)
 - **Session Management**: Create, join, and delete sessions with password protection
-- **Master Password**: Admin access with `$session123`
+- **Admin Access**: Secure administrator access controls
 - **Instrument Detection**: 10-second detection clips with auto-redirect
 - **Layered Recording**: Record over existing takes with monitor playback
 - **Auto-mix Creation**: Automatic mixdown when layering
@@ -31,7 +35,7 @@ Advanced mbira recording application with real-time note detection, synchronized
 
 1. **Clone and setup**:
 ```bash
-cd mbira-recording-session
+cd mbira-hub
 npm install
 node scripts/setup.js
 ```

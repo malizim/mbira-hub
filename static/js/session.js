@@ -28,6 +28,18 @@ let lastNoteTime = 0;
 let lastMaxValue = 0;
 const noteDebounceTime = 1000; // ms - increased to prevent sustained note repeats
 
+// Audio level calibration for different devices
+let audioLevelCalibration = {
+    enabled: false,
+    baselineLevel: 0,
+    sensitivityMultiplier: 1.0,
+    adaptiveThreshold: 60, // Lower default threshold for mobile devices
+    maxThreshold: 200,
+    minThreshold: 20,
+    calibrationSamples: [],
+    isCalibrating: false
+};
+
 // WebSocket connections
 let socket;
 let noteDetectionSocket;
@@ -319,8 +331,16 @@ function detectNotesRealtime() {
         }
     }
     
-    // Only process if we have a strong signal (increased threshold to reduce sensitivity)
-    if (maxValue > 180) {
+    // Use adaptive threshold based on device calibration
+    const threshold = audioLevelCalibration.enabled ? audioLevelCalibration.adaptiveThreshold : 60;
+    
+    // Collect calibration samples if calibrating
+    if (audioLevelCalibration.isCalibrating) {
+        audioLevelCalibration.calibrationSamples.push(maxValue);
+    }
+    
+    // Only process if we have a strong signal
+    if (maxValue > threshold) {
         const frequency = maxIndex * (sampleRate / 2) / bufferLength;
         const noteInfo = frequencyToNote(frequency);
         
@@ -329,6 +349,20 @@ function detectNotesRealtime() {
         
         if (currentNoteEl) currentNoteEl.textContent = noteInfo.note;
         if (currentFreqEl) currentFreqEl.textContent = frequency.toFixed(1) + ' Hz';
+        
+        // Update audio level indicator
+        const levelPercent = Math.min(100, (maxValue / 255) * 100);
+        const levelBar = document.getElementById('audioLevelBar');
+        const levelText = document.getElementById('audioLevelText');
+        if (levelBar) {
+            levelBar.style.width = levelPercent + '%';
+            levelBar.className = levelPercent > 70 ? 'bg-green-500 h-2 rounded-full transition-all duration-100' : 
+                                levelPercent > 40 ? 'bg-yellow-500 h-2 rounded-full transition-all duration-100' : 
+                                'bg-red-500 h-2 rounded-full transition-all duration-100';
+        }
+        if (levelText) {
+            levelText.textContent = Math.round(maxValue);
+        }
         
         if (noteInfo.inScale) {
             if (currentNoteEl) currentNoteEl.style.color = '#00ff88'; // Green

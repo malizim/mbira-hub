@@ -5,7 +5,7 @@
     background-image: url('/static/img/mbira_bg.png');
     background-size: cover;
     background-attachment: fixed;
-    background-position: center;
+    background-position: center 30%;
     min-height: 100vh;
 }
 
@@ -80,6 +80,26 @@
 
 a.logo-link {
     display: inline-block;
+}
+
+/* Mbira-Hub Logo Styling */
+.mbira-hub-logo {
+    transition: all 0.3s ease;
+}
+
+.mbira-hub-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Infinicore Systems Logo Styling */
+.infinicore-logo {
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.infinicore-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 /* Collapse controls */
@@ -330,9 +350,31 @@ a.logo-link {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+    .mbira-skin {
+        background-position: center 25%;
+    }
+    
     .container {
         padding: 10px;
         max-width: 100%;
+    }
+    
+    /* Mobile logo adjustments */
+    .mbira-hub-logo {
+        transform: scale(0.9);
+    }
+    
+    .infinicore-logo {
+        min-width: 60px;
+        transform: scale(0.8);
+    }
+    
+    .infinicore-logo .text-2xl {
+        font-size: 1.25rem;
+    }
+    
+    .infinicore-logo .text-xs {
+        font-size: 0.6rem;
     }
     
     .session-header h1 {

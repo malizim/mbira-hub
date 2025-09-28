@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎵 Mbira Recording Session</title>
+    <title>🎵 Mbira Hub - Professional Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
@@ -11,9 +11,17 @@
     <div class="max-w-6xl mx-auto p-6 space-y-6">
         <!-- Header -->
         <div class="flex items-center justify-between">
-            <div>
-                <div class="text-3xl font-black text-white">🎵 Mbira Recording Session</div>
-                <div class="text-sm text-slate-300">Create, detect, jam, and layer with real-time note detection</div>
+            <div class="flex items-center space-x-4">
+                <!-- Mbira-Hub Logo -->
+                <div class="flex items-center space-x-3 mbira-hub-logo">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                        <div class="text-2xl font-black text-blue-600">🎵</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-black text-white">Mbira Hub</div>
+                        <div class="text-sm text-slate-300">Professional mbira learning platform with real-time note detection</div>
+                    </div>
+                </div>
             </div>
             <a class="logo-link" href="https://live.telco.co.zw/event/texpo-steamon-2/track/texpo-steamon-25-hackathon-challenges-36" target="_blank" rel="noopener">
                 <div class="badge">
@@ -30,7 +38,7 @@
                 <input id="newPassword" type="password" class="border rounded px-3 py-2" placeholder="Password">
                 <button id="createBtn" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Create</button>
             </div>
-            <p class="text-sm text-slate-500 mt-2">Master password: <code>$session123</code></p>
+            <p class="text-sm text-slate-500 mt-2">Contact administrator for access credentials</p>
         </div>
 
         <!-- Join Existing Session -->
@@ -52,6 +60,19 @@
             <div id="sessions" class="grid gap-3"></div>
         </div>
 
+        <!-- Audio Level Calibration -->
+        <div class="border rounded-xl p-4 bg-white/90 backdrop-blur-sm">
+            <h2 class="font-semibold mb-2">🎤 Audio Level Calibration</h2>
+            <p class="text-sm text-slate-600 mb-4">Calibrate audio levels for optimal note detection on your device</p>
+            <div id="audioCalibration">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h3 class="font-semibold text-blue-800 mb-2">🎤 Audio Level Calibration</h3>
+                    <p class="text-sm text-blue-700 mb-3">Calibrate audio levels for optimal note detection on your device.</p>
+                    <button onclick="startAudioCalibration()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Calibration</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Real-time Note Detection Demo -->
         <div class="border rounded-xl p-4 bg-white/90 backdrop-blur-sm">
             <div class="flex items-center justify-between mb-2">
@@ -67,6 +88,13 @@
                 <div class="text-right">
                     <div id="currentNote" class="text-2xl font-bold text-purple-600">Ready</div>
                     <div id="currentFreq" class="text-sm text-slate-500">0 Hz</div>
+                    <div class="mt-2">
+                        <div class="text-xs text-slate-500 mb-1">Audio Level:</div>
+                        <div class="bg-slate-200 rounded-full h-2 w-32 mx-auto">
+                            <div id="audioLevelBar" class="bg-green-500 h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                        <div id="audioLevelText" class="text-xs text-slate-500 mt-1">0</div>
+                    </div>
                 </div>
             </div>
             <div id="noteSequence" class="mt-4 p-3 bg-slate-100 rounded text-sm font-mono min-h-[40px]">
@@ -202,6 +230,27 @@
             <div id="frequencyValidation" class="mt-2 text-center text-sm"></div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-6 border-t border-slate-300">
+        <div class="flex flex-col items-center space-y-4">
+            <!-- Infinicore Systems Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-black rounded-lg p-3 shadow-lg infinicore-logo">
+                    <div class="text-white text-center">
+                        <div class="text-2xl font-bold text-cyan-400">∞</div>
+                        <div class="text-xs font-bold text-white">INFINICORE</div>
+                        <div class="text-xs text-gray-300">SYSTEMS</div>
+                    </div>
+                </div>
+                <div class="text-center text-sm text-slate-500">
+                    <p>Developed for <strong>Texpo Steamon 2025</strong> by</p>
+                    <p class="font-semibold text-slate-700">Infinicore Systems (Pvt) Ltd</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400">Professional mbira learning and recording platform</p>
+        </div>
+    </footer>
 
     <script src="/static/js/main.js"></script>
 </body>

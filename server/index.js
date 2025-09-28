@@ -600,16 +600,63 @@ app.post('/api/sessions/:sid/finish', async (req, res) => {
 
 // WebSocket server for real-time note detection
 const serverFactory = () => {
-    const certPath = path.join(CERT_DIR, 'cert.pem');
-    const keyPath = path.join(CERT_DIR, 'key.pem');
-    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
+    // Check if SSL is disabled via environment variable
+    if (process.env.DISABLE_SSL === 'true') {
+        console.log('🔓 SSL disabled via DISABLE_SSL environment variable');
+        const server = http.createServer(app);
+        const io = new IOServer(server, { cors: { origin: true, credentials: true } });
+        return { server, io, https: false };
+    }
+    
+    // Check for Let's Encrypt certificates first
+    const letsEncryptPath = '/etc/letsencrypt/live';
+    const domain = process.env.DOMAIN || 'localhost';
+    const leCertPath = path.join(letsEncryptPath, domain, 'fullchain.pem');
+    const leKeyPath = path.join(letsEncryptPath, domain, 'privkey.pem');
+    
+    // Check for custom domain certificates in local certs directory
+    const customDomainCertPath = path.join(CERT_DIR, domain, 'fullchain.pem');
+    const customDomainKeyPath = path.join(CERT_DIR, domain, 'privkey.pem');
+    
+    // Check for local certificates (fallback)
+    const localCertPath = path.join(CERT_DIR, 'cert.pem');
+    const localKeyPath = path.join(CERT_DIR, 'key.pem');
+    
+    let certPath, keyPath, certSource;
+    
+    // Priority: Let's Encrypt > Custom Domain > Local certificates
+    if (fs.existsSync(leCertPath) && fs.existsSync(leKeyPath)) {
+        certPath = leCertPath;
+        keyPath = leKeyPath;
+        certSource = 'Let\'s Encrypt';
+        console.log(`🔒 Using Let's Encrypt certificate for domain: ${domain}`);
+    } else if (fs.existsSync(customDomainCertPath) && fs.existsSync(customDomainKeyPath)) {
+        certPath = customDomainCertPath;
+        keyPath = customDomainKeyPath;
+        certSource = 'Custom Domain';
+        console.log(`🔒 Using custom domain certificate for: ${domain}`);
+    } else if (fs.existsSync(localCertPath) && fs.existsSync(localKeyPath)) {
+        certPath = localCertPath;
+        keyPath = localKeyPath;
+        certSource = 'Local';
+        console.log('🔒 Using local SSL certificate');
+    } else {
+        console.log('⚠️  No SSL certificates found, using HTTP');
+        const server = http.createServer(app);
+        const io = new IOServer(server, { cors: { origin: true, credentials: true } });
+        return { server, io, https: false };
+    }
+    
+    try {
         const server = https.createServer({ 
             cert: fs.readFileSync(certPath), 
             key: fs.readFileSync(keyPath) 
         }, app);
         const io = new IOServer(server, { cors: { origin: true, credentials: true } });
+        console.log(`✅ HTTPS server started with ${certSource} certificate`);
         return { server, io, https: true };
-    } else {
+    } catch (error) {
+        console.log(`⚠️  SSL certificate error (${certSource}), falling back to HTTP:`, error.message);
         const server = http.createServer(app);
         const io = new IOServer(server, { cors: { origin: true, credentials: true } });
         return { server, io, https: false };
@@ -661,7 +708,7 @@ wss.on('connection', (ws) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🎵 Mbira Recording Session listening on ${usingHttps ? 'https' : 'http'}://0.0.0.0:${PORT}`);
+    console.log(`🎵 Mbira Hub listening on ${usingHttps ? 'https' : 'http'}://0.0.0.0:${PORT}`);
     console.log(`🔗 Real-time WebSocket: ws://0.0.0.0:${WS_PORT}`);
     console.log('📁 Data dir:', DATA);
 });

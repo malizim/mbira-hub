@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const MASTER_PASSWORD = process.env.MASTER_PASSWORD || '$session123';
+const MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'admin_access_2025';
 
 // Hash password using SHA256 (matching LKG implementation)
 export function hashPassword(password) {
