@@ -1,7 +1,8 @@
-# 🎵 Mbira Hub v1.0
+# 🎵 Mbira Hub V1.1
 
-       
-Professional mbira learning and recording platform with real-time note detection, synchronized playback highlighting, and music sheet generation.
+**Professional mbira learning and recording platform with Enhanced Audio Calibration & Mini-DAW**
+
+Professional mbira learning and recording platform with real-time note detection, synchronized playback highlighting, music sheet generation, enhanced audio calibration, and professional mini-DAW interface.
 
 **Developed for Texpo Steamon 2025 by Infinicore Systems (Pvt) Ltd**
 
@@ -27,6 +28,16 @@ Professional mbira learning and recording platform with real-time note detection
 - **Music Sheet Generation**: Generate PDF/SVG/text music sheets from note sequences
 - **WebSocket Updates**: Real-time session synchronization
 - **Enhanced UI**: Mbira-themed design with background and logo integration
+
+### V1.1 Enhanced Features
+- **🎤 Enhanced Audio Calibration**: Professional audio level calibration with real-time monitoring
+- **🎛️ Professional Mini-DAW**: Studio-grade multi-track recording interface
+- **🎵 Advanced EQ Controls**: Bass, mid, treble controls with instrument-specific presets
+- **📊 Real-time Waveform Visualization**: Visual audio feedback during recording
+- **🎚️ Transport Controls**: Professional play, stop, record controls with timeline
+- **🎧 Audio Source Selection**: Microphone and line-in input options
+- **🔊 Enhanced Audio Quality**: 48kHz sample rate, Opus codec, improved FFT analysis
+- **🎨 Professional UI**: Dark theme DAW interface with studio-grade controls
 
 ## 🚀 Quick Start
 
