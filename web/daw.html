@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎵 Mbira Hub - Professional Recording Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/wavesurfer.js@7"></script>
+    <style>
+        /* DAW-specific styles */
+        .daw-container {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            min-height: 100vh;
+        }
+        
+        .track {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .track-header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+        
+        .track-content {
+            padding: 12px;
+        }
+        
+        .waveform-container {
+            height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        
+        .transport-controls {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .transport-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        
+        .transport-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .play-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .stop-btn {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .record-btn {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .record-btn.recording {
+            background: #ef4444;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .level-meter {
+            width: 4px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .level-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #10b981, #f59e0b, #ef4444);
+            transition: height 0.1s;
+        }
+        
+        .timeline {
+            background: rgba(0, 0, 0, 0.3);
+            height: 40px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .playhead {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #10b981;
+            z-index: 10;
+        }
+        
+        .track-mute {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .track-mute.active {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .track-solo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .track-solo.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .track-volume {
+            width: 80px;
+        }
+        
+        .track-pan {
+            width: 60px;
+        }
+        
+        .eq-band {
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body class="daw-container">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- DAW Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                    <div class="text-2xl font-black text-blue-400">🎵</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-black text-white">Mbira Studio</div>
+                    <div class="text-sm text-slate-300">Professional Recording & Mixing</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-sm text-slate-300">
+                    Session: <span id="sessionName" class="font-semibold text-white">Loading...</span>
+                </div>
+                <button onclick="window.location.href='/'" class="px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-700">
+                    ← Back to Sessions
+                </button>
+            </div>
+        </div>
+
+        <!-- Transport Controls -->
+        <div class="transport-controls mb-6">
+            <button id="playBtn" class="transport-btn play-btn">▶</button>
+            <button id="stopBtn" class="transport-btn stop-btn">⏹</button>
+            <button id="recordBtn" class="transport-btn record-btn">⏺</button>
+            
+            <div class="flex-1 mx-4">
+                <div class="timeline" id="timeline">
+                    <div class="playhead" id="playhead" style="left: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="text-white text-sm">
+                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+            </div>
+            
+            <div class="level-meter">
+                <div class="level-bar" id="levelBar" style="height: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Recording Controls -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
+            <h3 class="text-lg font-semibold text-white mb-4">🎤 Recording Setup</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Instrument</label>
+                    <input id="instrumentName" type="text" class="w-full px-3 py-2 bg-slate-700 text-white rounded border-slate-600" placeholder="e.g., Mbira, Guitar">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">User</label>
+                    <input id="userName" type="text" class="w-full px-3 py-2 bg-slate-700 text-white rounded border-slate-600" placeholder="Your name">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Recording Mode</label>
+                    <select id="recordingMode" class="w-full px-3 py-2 bg-slate-700 text-white rounded border-slate-600">
+                        <option value="solo">Solo Recording</option>
+                        <option value="overdub">Overdub (Layer)</option>
+                        <option value="replace">Replace Track</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracks Container -->
+        <div id="tracksContainer" class="space-y-4">
+            <!-- Tracks will be dynamically generated here -->
+        </div>
+
+        <!-- Add Track Button -->
+        <div class="text-center mt-6">
+            <button id="addTrackBtn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                + Add New Track
+            </button>
+        </div>
+    </div>
+
+    <script src="/static/js/daw.js"></script>
+</body>
+</html>

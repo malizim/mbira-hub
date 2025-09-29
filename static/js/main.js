@@ -7,17 +7,200 @@ let lastNoteTime = 0;
 let lastMaxValue = 0;
 const noteDebounceTime = 1000; // ms - increased to prevent sustained note repeats
 
-// Audio level calibration for different devices
+// Enhanced audio level calibration with EQ and source selection
 let audioLevelCalibration = {
     enabled: false,
     baselineLevel: 0,
     sensitivityMultiplier: 1.0,
-    adaptiveThreshold: 60, // Lower default threshold for mobile devices
+    adaptiveThreshold: 60,
     maxThreshold: 200,
     minThreshold: 20,
     calibrationSamples: [],
-    isCalibrating: false
+    isCalibrating: false,
+    audioContext: null,
+    analyser: null,
+    microphone: null,
+    stream: null,
+    // EQ settings
+    eqSettings: {
+        bass: 0,      // -20 to +20 dB
+        mid: 0,       // -20 to +20 dB  
+        treble: 0,    // -20 to +20 dB
+        preset: 'flat' // flat, mbira, guitar, piano, vocal
+    },
+    // Source selection
+    selectedSource: 'microphone', // microphone, line-in, bluetooth
+    availableSources: []
 };
+
+// Enhanced audio calibration functions
+async function startAudioCalibration() {
+    try {
+        console.log('Starting enhanced audio calibration...');
+        
+        // Get high-quality audio stream for calibration
+        const audioConstraints = {
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false,
+                sampleRate: 48000,
+                codec: 'opus',
+                channelCount: 1,
+                latency: 0.01,
+                volume: 1.0
+            }
+        };
+        
+        audioLevelCalibration.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+        audioLevelCalibration.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioLevelCalibration.analyser = audioLevelCalibration.audioContext.createAnalyser();
+        audioLevelCalibration.microphone = audioLevelCalibration.audioContext.createMediaStreamSource(audioLevelCalibration.stream);
+        
+        // Enhanced analyser settings
+        audioLevelCalibration.analyser.fftSize = 16384;
+        audioLevelCalibration.analyser.smoothingTimeConstant = 0.1;
+        audioLevelCalibration.analyser.minDecibels = -90;
+        audioLevelCalibration.analyser.maxDecibels = -10;
+        
+        // Connect with EQ processing
+        audioLevelCalibration.microphone.connect(audioLevelCalibration.analyser);
+        
+        audioLevelCalibration.isCalibrating = true;
+        audioLevelCalibration.calibrationSamples = [];
+        
+        // Update UI
+        document.getElementById('calibrationStatus').textContent = 'Calibrating... Play your mbira now!';
+        document.getElementById('calibrationLevel').textContent = '0 dB';
+        document.getElementById('calibrationProgress').style.width = '0%';
+        
+        // Start calibration monitoring
+        monitorCalibrationLevel();
+        
+        // Auto-stop after 10 seconds
+        setTimeout(() => {
+            if (audioLevelCalibration.isCalibrating) {
+                stopAudioCalibration();
+            }
+        }, 10000);
+        
+    } catch (error) {
+        console.error('Audio calibration error:', error);
+        alert('Failed to start audio calibration: ' + error.message);
+    }
+}
+
+function stopAudioCalibration() {
+    if (audioLevelCalibration.isCalibrating) {
+        audioLevelCalibration.isCalibrating = false;
+        
+        if (audioLevelCalibration.stream) {
+            audioLevelCalibration.stream.getTracks().forEach(track => track.stop());
+        }
+        
+        if (audioLevelCalibration.audioContext) {
+            audioLevelCalibration.audioContext.close();
+        }
+        
+        // Calculate optimal settings
+        if (audioLevelCalibration.calibrationSamples.length > 0) {
+            const avgLevel = audioLevelCalibration.calibrationSamples.reduce((a, b) => a + b) / audioLevelCalibration.calibrationSamples.length;
+            const maxLevel = Math.max(...audioLevelCalibration.calibrationSamples);
+            
+            audioLevelCalibration.baselineLevel = avgLevel;
+            audioLevelCalibration.adaptiveThreshold = Math.min(maxLevel * 0.8, 150);
+            
+            console.log('Calibration complete:', {
+                avgLevel: avgLevel.toFixed(2),
+                maxLevel: maxLevel.toFixed(2),
+                threshold: audioLevelCalibration.adaptiveThreshold.toFixed(2)
+            });
+            
+            document.getElementById('calibrationStatus').textContent = `Calibration complete! Avg: ${avgLevel.toFixed(1)}dB, Threshold: ${audioLevelCalibration.adaptiveThreshold.toFixed(1)}dB`;
+        }
+    }
+}
+
+function monitorCalibrationLevel() {
+    if (!audioLevelCalibration.isCalibrating || !audioLevelCalibration.analyser) return;
+    
+    const bufferLength = audioLevelCalibration.analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    audioLevelCalibration.analyser.getByteFrequencyData(dataArray);
+    
+    // Calculate RMS level
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i] * dataArray[i];
+    }
+    const rms = Math.sqrt(sum / bufferLength);
+    const dbLevel = 20 * Math.log10(rms / 255);
+    
+    // Store sample
+    audioLevelCalibration.calibrationSamples.push(dbLevel);
+    
+    // Update UI
+    document.getElementById('calibrationLevel').textContent = `${dbLevel.toFixed(1)} dB`;
+    const progressPercent = Math.min(Math.max((dbLevel + 60) / 60 * 100, 0), 100);
+    document.getElementById('calibrationProgress').style.width = `${progressPercent}%`;
+    
+    // Color coding
+    const progressBar = document.getElementById('calibrationProgress');
+    if (dbLevel < -30) {
+        progressBar.className = 'bg-red-500 h-2 rounded-full transition-all duration-100';
+    } else if (dbLevel < -20) {
+        progressBar.className = 'bg-yellow-500 h-2 rounded-full transition-all duration-100';
+    } else {
+        progressBar.className = 'bg-green-500 h-2 rounded-full transition-all duration-100';
+    }
+    
+    // Continue monitoring
+    requestAnimationFrame(monitorCalibrationLevel);
+}
+
+// EQ Presets
+const EQ_PRESETS = {
+    flat: { bass: 0, mid: 0, treble: 0, name: 'Flat' },
+    mbira: { bass: 2, mid: 4, treble: 1, name: 'Mbira Enhanced' },
+    guitar: { bass: 1, mid: 3, treble: 2, name: 'Guitar' },
+    piano: { bass: 0, mid: 2, treble: 3, name: 'Piano' },
+    vocal: { bass: -1, mid: 2, treble: 1, name: 'Vocal' },
+    bass: { bass: 6, mid: 1, treble: -2, name: 'Bass Heavy' },
+    bright: { bass: -2, mid: 1, treble: 4, name: 'Bright' }
+};
+
+function applyEQPreset(presetName) {
+    const preset = EQ_PRESETS[presetName];
+    if (preset) {
+        audioLevelCalibration.eqSettings.bass = preset.bass;
+        audioLevelCalibration.eqSettings.mid = preset.mid;
+        audioLevelCalibration.eqSettings.treble = preset.treble;
+        audioLevelCalibration.eqSettings.preset = presetName;
+        
+        // Update UI
+        document.getElementById('bassSlider').value = preset.bass;
+        document.getElementById('midSlider').value = preset.mid;
+        document.getElementById('trebleSlider').value = preset.treble;
+        document.getElementById('bassValue').textContent = `${preset.bass}dB`;
+        document.getElementById('midValue').textContent = `${preset.mid}dB`;
+        document.getElementById('trebleValue').textContent = `${preset.treble}dB`;
+        
+        console.log('Applied EQ preset:', presetName, preset);
+    }
+}
+
+function updateEQSettings() {
+    audioLevelCalibration.eqSettings.bass = parseFloat(document.getElementById('bassSlider').value);
+    audioLevelCalibration.eqSettings.mid = parseFloat(document.getElementById('midSlider').value);
+    audioLevelCalibration.eqSettings.treble = parseFloat(document.getElementById('trebleSlider').value);
+    
+    // Update display values
+    document.getElementById('bassValue').textContent = `${audioLevelCalibration.eqSettings.bass}dB`;
+    document.getElementById('midValue').textContent = `${audioLevelCalibration.eqSettings.mid}dB`;
+    document.getElementById('trebleValue').textContent = `${audioLevelCalibration.eqSettings.treble}dB`;
+    
+    console.log('EQ updated:', audioLevelCalibration.eqSettings);
+}
 
 // Note mapping for real-time detection
 const NOTE_MAPPING = {
@@ -1175,3 +1358,50 @@ document.getElementById('fullscreenStopDetection').addEventListener('click', sto
 
 // Initialize
 fetchSessions();
+
+// Setup EQ event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // EQ sliders
+    const bassSlider = document.getElementById('bassSlider');
+    const midSlider = document.getElementById('midSlider');
+    const trebleSlider = document.getElementById('trebleSlider');
+    
+    if (bassSlider) {
+        bassSlider.addEventListener('input', updateEQSettings);
+    }
+    if (midSlider) {
+        midSlider.addEventListener('input', updateEQSettings);
+    }
+    if (trebleSlider) {
+        trebleSlider.addEventListener('input', updateEQSettings);
+    }
+    
+    // Source selection
+    const sourceMicrophone = document.getElementById('sourceMicrophone');
+    const sourceLineIn = document.getElementById('sourceLineIn');
+    
+    if (sourceMicrophone) {
+        sourceMicrophone.addEventListener('click', () => selectAudioSource('microphone'));
+    }
+    if (sourceLineIn) {
+        sourceLineIn.addEventListener('click', () => selectAudioSource('line-in'));
+    }
+});
+
+function selectAudioSource(source) {
+    audioLevelCalibration.selectedSource = source;
+    
+    // Update UI
+    document.querySelectorAll('[id^="source"]').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-slate-200', 'text-slate-700');
+    });
+    
+    const sourceBtn = document.getElementById(`source${source.charAt(0).toUpperCase() + source.slice(1).replace('-', '')}`);
+    if (sourceBtn) {
+        sourceBtn.classList.remove('bg-slate-200', 'text-slate-700');
+        sourceBtn.classList.add('bg-blue-600', 'text-white');
+    }
+    
+    console.log('Selected audio source:', source);
+}

@@ -60,15 +60,77 @@
             <div id="sessions" class="grid gap-3"></div>
         </div>
 
-        <!-- Audio Level Calibration -->
+        <!-- Enhanced Audio Level Calibration -->
         <div class="border rounded-xl p-4 bg-white/90 backdrop-blur-sm">
-            <h2 class="font-semibold mb-2">🎤 Audio Level Calibration</h2>
-            <p class="text-sm text-slate-600 mb-4">Calibrate audio levels for optimal note detection on your device</p>
-            <div id="audioCalibration">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                    <h3 class="font-semibold text-blue-800 mb-2">🎤 Audio Level Calibration</h3>
-                    <p class="text-sm text-blue-700 mb-3">Calibrate audio levels for optimal note detection on your device.</p>
-                    <button onclick="startAudioCalibration()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Calibration</button>
+            <h2 class="font-semibold mb-2">🎤 Enhanced Audio Calibration</h2>
+            <p class="text-sm text-slate-600 mb-4">Professional audio calibration with EQ and source selection</p>
+            
+            <!-- Audio Source Selection -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium mb-2">Audio Source</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="sourceMicrophone" class="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">🎤 Microphone</button>
+                    <button id="sourceLineIn" class="px-3 py-2 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300">🔌 Line In</button>
+                </div>
+            </div>
+            
+            <!-- EQ Controls -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium mb-2">Equalizer</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <label class="block text-xs font-medium mb-1">Bass</label>
+                        <input type="range" id="bassSlider" min="-20" max="20" step="1" value="0" class="w-full">
+                        <div id="bassValue" class="text-xs text-slate-500 mt-1">0dB</div>
+                    </div>
+                    <div class="text-center">
+                        <label class="block text-xs font-medium mb-1">Mid</label>
+                        <input type="range" id="midSlider" min="-20" max="20" step="1" value="0" class="w-full">
+                        <div id="midValue" class="text-xs text-slate-500 mt-1">0dB</div>
+                    </div>
+                    <div class="text-center">
+                        <label class="block text-xs font-medium mb-1">Treble</label>
+                        <input type="range" id="trebleSlider" min="-20" max="20" step="1" value="0" class="w-full">
+                        <div id="trebleValue" class="text-xs text-slate-500 mt-1">0dB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- EQ Presets -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium mb-2">EQ Presets</h3>
+                <div class="grid grid-cols-4 gap-1">
+                    <button onclick="applyEQPreset('flat')" class="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs hover:bg-slate-300">Flat</button>
+                    <button onclick="applyEQPreset('mbira')" class="px-2 py-1 bg-purple-200 text-purple-700 rounded text-xs hover:bg-purple-300">Mbira</button>
+                    <button onclick="applyEQPreset('guitar')" class="px-2 py-1 bg-green-200 text-green-700 rounded text-xs hover:bg-green-300">Guitar</button>
+                    <button onclick="applyEQPreset('piano')" class="px-2 py-1 bg-blue-200 text-blue-700 rounded text-xs hover:bg-blue-300">Piano</button>
+                    <button onclick="applyEQPreset('vocal')" class="px-2 py-1 bg-pink-200 text-pink-700 rounded text-xs hover:bg-pink-300">Vocal</button>
+                    <button onclick="applyEQPreset('bass')" class="px-2 py-1 bg-orange-200 text-orange-700 rounded text-xs hover:bg-orange-300">Bass</button>
+                    <button onclick="applyEQPreset('bright')" class="px-2 py-1 bg-yellow-200 text-yellow-700 rounded text-xs hover:bg-yellow-300">Bright</button>
+                </div>
+            </div>
+            
+            <!-- Calibration Controls -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-blue-800 mb-2 text-sm">🎤 Audio Level Calibration</h3>
+                <p class="text-xs text-blue-700 mb-3">Play your mbira to calibrate optimal audio levels and detection sensitivity.</p>
+                
+                <!-- Calibration Status -->
+                <div class="mb-3">
+                    <div id="calibrationStatus" class="text-sm text-slate-600 mb-2">Ready to calibrate</div>
+                    <div class="flex items-center space-x-2">
+                        <div class="text-sm font-medium">Level:</div>
+                        <div id="calibrationLevel" class="text-sm font-bold text-blue-600">0 dB</div>
+                    </div>
+                    <div class="bg-slate-200 rounded-full h-2 w-full mt-1">
+                        <div id="calibrationProgress" class="bg-red-500 h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Calibration Buttons -->
+                <div class="flex space-x-2">
+                    <button onclick="startAudioCalibration()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Start Calibration</button>
+                    <button onclick="stopAudioCalibration()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Stop Calibration</button>
                 </div>
             </div>
         </div>
