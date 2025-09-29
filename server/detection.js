@@ -21,7 +21,7 @@ const NOTE_MAPPING = {
 /**
  * Convert audio blob to WAV bytes using ffmpeg
  */
-export async function blobToWavBytes(blob, targetRate = 44100) {
+export async function blobToWavBytes(blob, targetRate = 48000) {
     const tempDir = path.join(process.env.DATA_DIR || './data', '_tmp');
     fs.mkdirSync(tempDir, { recursive: true });
     

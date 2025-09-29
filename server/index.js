@@ -320,12 +320,27 @@ app.post('/api/sessions/:sid/upload', upload.single('audio'), async (req, res) =
         const soloName = `${recPrefix}${nextIndex(recDir, recPrefix)}.wav`;
         const soloPath = path.join(recDir, soloName);
 
-        // Convert webm/ogg to wav 44.1k mono
+        // Convert webm/ogg to high-quality wav 48k mono with better processing
         await new Promise((resolve, reject) => {
-            ffmpeg(req.file.path).outputOptions(['-ar 44100', '-ac 1', '-f wav'])
-                .on('end', resolve).on('error', reject).save(soloPath);
+            ffmpeg(req.file.path)
+                .outputOptions([
+                    '-ar 48000',  // Higher sample rate for better quality
+                    '-ac 1',      // Mono channel
+                    '-f wav',     // WAV format
+                    '-acodec pcm_s16le',  // 16-bit PCM encoding
+                    '-af "highpass=f=80,lowpass=f=1200"',  // Filter for mbira frequency range
+                    '-compression_level 0'  // No compression for maximum quality
+                ])
+                .on('end', resolve)
+                .on('error', reject)
+                .save(soloPath);
         }).catch(e => {
             console.error('ffmpeg convert error', e);
+            // Fallback to basic conversion if advanced options fail
+            return new Promise((resolve, reject) => {
+                ffmpeg(req.file.path).outputOptions(['-ar 48000', '-ac 1', '-f wav'])
+                    .on('end', resolve).on('error', reject).save(soloPath);
+            });
         });
         fs.unlink(req.file.path, () => {});
 

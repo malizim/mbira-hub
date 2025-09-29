@@ -62,21 +62,39 @@ async function fetchSessions() {
 // Real-time note detection functions
 async function startDetection() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
+        // High-quality audio constraints for musical instruments
+        const audioConstraints = {
             audio: {
+                // Disable browser audio processing for musical instruments
                 echoCancellation: false,
                 noiseSuppression: false,
                 autoGainControl: false,
-                sampleRate: 44100
+                
+                // Request high sample rate for better frequency resolution
+                sampleRate: 48000,  // Higher than standard 44100
+                
+                // Request specific audio codecs for better quality
+                codec: 'opus',
+                
+                // Channel configuration
+                channelCount: 1,  // Mono for mbira
+                
+                // Latency optimization
+                latency: 0.01,  // 10ms latency
+                
+                // Volume constraints
+                volume: 1.0
             }
-        });
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
         
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         microphone = audioContext.createMediaStreamSource(stream);
         
-        analyser.fftSize = 8192;
-        analyser.smoothingTimeConstant = 0.3;
+        analyser.fftSize = 16384;  // Increased from 8192 for better frequency resolution
+        analyser.smoothingTimeConstant = 0.1;  // More responsive detection
         microphone.connect(analyser);
         
         isDetecting = true;
@@ -701,14 +719,21 @@ async function startTraining() {
     
     // Set up audio recording for training
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        // High-quality audio constraints for training
+        const trainingAudioConstraints = {
             audio: {
                 echoCancellation: false,
                 noiseSuppression: false,
                 autoGainControl: false,
-                sampleRate: 48000
+                sampleRate: 48000,  // Higher sample rate for better quality
+                codec: 'opus',
+                channelCount: 1,
+                latency: 0.01,
+                volume: 1.0
             }
-        });
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(trainingAudioConstraints);
         
         trainingAudioContext = new (window.AudioContext || window.webkitAudioContext)();
         trainingMediaRecorder = new MediaRecorder(stream);

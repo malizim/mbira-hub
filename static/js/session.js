@@ -62,8 +62,35 @@ const NOTE_MAPPING = {
 };
 
 async function getMicStream() {
-    const c = { audio: currentMicId ? { deviceId: { exact: currentMicId } } : true };
-    return await navigator.mediaDevices.getUserMedia(c);
+    // High-quality audio constraints for musical instrument recording
+    const audioConstraints = {
+        audio: {
+            // Disable browser audio processing for musical instruments
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+            
+            // Request high sample rate for better quality
+            sampleRate: 48000,  // Higher than standard 44100
+            
+            // Request specific audio codecs
+            codec: 'opus',
+            
+            // Channel configuration
+            channelCount: 1,  // Mono for mbira
+            
+            // Latency optimization
+            latency: 0.01,  // 10ms latency
+            
+            // Volume constraints
+            volume: 1.0,
+            
+            // Device-specific constraints
+            deviceId: currentMicId ? { exact: currentMicId } : undefined
+        }
+    };
+    
+    return await navigator.mediaDevices.getUserMedia(audioConstraints);
 }
 
 async function populateDevices() {
@@ -740,7 +767,19 @@ async function startRecordingAfterCountdown() {
     try {
         const stream = await getMicStream();
         chunks = [];
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        
+        // Try to use high-quality codecs, fallback to webm
+        let mimeType = 'audio/webm';
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            mimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+            mimeType = 'audio/ogg;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+            mimeType = 'audio/webm';
+        }
+        
+        console.log('Using audio codec:', mimeType);
+        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
         mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
         mediaRecorder.onstop = async () => {
             const blob = new Blob(chunks, { type: 'audio/webm' });

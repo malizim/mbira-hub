@@ -73,6 +73,58 @@
             </div>
         </div>
 
+        <!-- Audio Quality Settings -->
+        <div class="border rounded-xl p-4 bg-white/90 backdrop-blur-sm">
+            <h2 class="font-semibold mb-2">🎵 Audio Quality Settings</h2>
+            <p class="text-sm text-slate-600 mb-4">Optimize audio quality for your device and environment</p>
+            <div id="audioQualitySettings" class="grid md:grid-cols-2 gap-4">
+                <div class="setting-group">
+                    <label class="block text-sm font-medium mb-1">Sample Rate:</label>
+                    <select id="sampleRateSelect" class="w-full px-3 py-2 border rounded">
+                        <option value="44100">44.1 kHz (Standard)</option>
+                        <option value="48000" selected>48 kHz (High Quality)</option>
+                        <option value="96000">96 kHz (Professional)</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="block text-sm font-medium mb-1">Detection Sensitivity:</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="range" id="sensitivitySlider" min="0.1" max="0.9" step="0.1" value="0.1" class="flex-1">
+                        <span id="sensitivityValue" class="text-sm text-slate-500">0.1</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label class="block text-sm font-medium mb-1">FFT Resolution:</label>
+                    <select id="fftSizeSelect" class="w-full px-3 py-2 border rounded">
+                        <option value="8192">8192 (Standard)</option>
+                        <option value="16384" selected>16384 (High Resolution)</option>
+                        <option value="32768">32768 (Maximum)</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="block text-sm font-medium mb-1">Audio Processing:</label>
+                    <div class="space-y-1">
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="disableEchoCancellation" checked class="mr-2">
+                            Disable Echo Cancellation
+                        </label>
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="disableNoiseSuppression" checked class="mr-2">
+                            Disable Noise Suppression
+                        </label>
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="disableAutoGain" checked class="mr-2">
+                            Disable Auto Gain Control
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button id="testAudioQuality" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Test Audio Quality</button>
+                <button id="resetAudioSettings" class="px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-700 ml-2">Reset to Defaults</button>
+            </div>
+        </div>
+
         <!-- Real-time Note Detection Demo -->
         <div class="border rounded-xl p-4 bg-white/90 backdrop-blur-sm">
             <div class="flex items-center justify-between mb-2">
@@ -252,6 +304,7 @@
         </div>
     </footer>
 
+    <script src="/static/js/audio-quality.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>
